@@ -1,0 +1,874 @@
+openapi: 3.1.0
+info:
+  title: AI-SOC MCP Tools API
+  description: Model Context Protocol tool definitions for security operations
+  version: 1.0.0
+  contact:
+    name: AI-SOC Platform Team
+
+servers:
+  - url: http://localhost:8001
+    description: Local MCP server
+  - url: https://mcp.ai-soc.example.com
+    description: Production MCP server
+
+tags:
+  - name: evidence
+    description: Evidence & Log tools
+  - name: threatintel
+    description: Threat Intelligence tools
+  - name: case
+    description: Case Management tools
+  - name: rag
+    description: RAG & Knowledge tools
+  - name: actions
+    description: Safe Action tools
+
+paths:
+  /tools/log_search:
+    post:
+      tags: [evidence]
+      summary: Search security logs for matching events
+      operationId: logSearch
+      security:
+        - agentAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogSearchInput'
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogSearchOutput'
+        '400':
+          description: Invalid query syntax
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolError'
+
+  /tools/event_timeline:
+    post:
+      tags: [evidence]
+      summary: Build timeline of events for an entity
+      operationId: eventTimeline
+      security:
+        - agentAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventTimelineInput'
+      responses:
+        '200':
+          description: Event timeline
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventTimelineOutput'
+
+  /tools/normalize_iocs:
+    post:
+      tags: [evidence]
+      summary: Extract and normalize IOCs from text
+      operationId: normalizeIOCs
+      security:
+        - agentAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NormalizeIOCsInput'
+      responses:
+        '200':
+          description: Normalized IOCs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NormalizeIOCsOutput'
+
+  /tools/parse_raw_log:
+    post:
+      tags: [evidence]
+      summary: Parse raw log entry into structured format
+      operationId: parseRawLog
+      security:
+        - agentAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParseRawLogInput'
+      responses:
+        '200':
+          description: Parsed log
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParseRawLogOutput'
+
+  /tools/ioc_reputation:
+    post:
+      tags: [threatintel]
+      summary: Check IOC reputation across threat intel sources
+      operationId: iocReputation
+      security:
+        - agentAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IOCReputationInput'
+      responses:
+        '200':
+          description: Reputation results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IOCReputationOutput'
+
+  /tools/mitre_mapper:
+    post:
+      tags: [threatintel]
+      summary: Map attack behavior to MITRE ATT&CK techniques
+      operationId: mitreMapper
+      security:
+        - agentAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MitreMapperInput'
+      responses:
+        '200':
+          description: MITRE mappings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MitreMapperOutput'
+
+  /tools/enrichment_geoip:
+    post:
+      tags: [threatintel]
+      summary: Get GeoIP information for IP addresses
+      operationId: enrichmentGeoIP
+      security:
+        - agentAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeoIPInput'
+      responses:
+        '200':
+          description: GeoIP information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoIPOutput'
+
+  /tools/create_case:
+    post:
+      tags: [case]
+      summary: Create a new incident case
+      operationId: createCase
+      security:
+        - agentAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCaseInput'
+      responses:
+        '201':
+          description: Case created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCaseOutput'
+
+  /tools/add_case_note:
+    post:
+      tags: [case]
+      summary: Add a note to an existing case
+      operationId: addCaseNote
+      security:
+        - agentAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCaseNoteInput'
+      responses:
+        '200':
+          description: Note added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddCaseNoteOutput'
+
+  /tools/generate_incident_report:
+    post:
+      tags: [case]
+      summary: Generate structured incident report
+      operationId: generateIncidentReport
+      security:
+        - agentAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateReportInput'
+      responses:
+        '200':
+          description: Generated report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateReportOutput'
+
+  /tools/rag_retrieve:
+    post:
+      tags: [rag]
+      summary: Retrieve relevant textbook chunks
+      operationId: ragRetrieve
+      security:
+        - agentAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RAGRetrieveInput'
+      responses:
+        '200':
+          description: Retrieved chunks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RAGRetrieveOutput'
+
+  /tools/rag_eval_run:
+    post:
+      tags: [rag]
+      summary: Run RAG evaluation suite
+      operationId: ragEvalRun
+      security:
+        - agentAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RAGEvalInput'
+      responses:
+        '200':
+          description: Evaluation results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RAGEvalOutput'
+
+  /tools/request_action:
+    post:
+      tags: [actions]
+      summary: Request approval for disruptive action
+      operationId: requestAction
+      security:
+        - agentAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestActionInput'
+      responses:
+        '201':
+          description: Approval request created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestActionOutput'
+
+  /tools/approve_action:
+    post:
+      tags: [actions]
+      summary: Execute an approved action (internal use)
+      operationId: approveAction
+      security:
+        - systemAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproveActionInput'
+      responses:
+        '200':
+          description: Action executed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApproveActionOutput'
+
+components:
+  securitySchemes:
+    agentAuth:
+      type: apiKey
+      in: header
+      name: X-Agent-Token
+      description: Agent authentication token
+    systemAuth:
+      type: apiKey
+      in: header
+      name: X-System-Token
+      description: System-level authentication token
+
+  schemas:
+    # Evidence & Logs
+    LogSearchInput:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+          description: Lucene query syntax
+          example: "event.action:login AND source.ip:192.168.*"
+        time_range:
+          type: string
+          enum: [1h, 24h, 7d, 30d]
+          default: 24h
+        source:
+          type: string
+          description: Optional log source filter
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 1000
+          default: 100
+
+    LogSearchOutput:
+      type: object
+      required: [hits, total, took_ms]
+      properties:
+        hits:
+          type: array
+          items:
+            $ref: '#/components/schemas/LogEntry'
+        total:
+          type: integer
+        took_ms:
+          type: integer
+
+    LogEntry:
+      type: object
+      required: [timestamp, source, message]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        source:
+          type: string
+        message:
+          type: string
+        fields:
+          type: object
+          additionalProperties: true
+
+    EventTimelineInput:
+      type: object
+      required: [entity_type, entity_value]
+      properties:
+        entity_type:
+          type: string
+          enum: [ip, user, host, domain]
+        entity_value:
+          type: string
+        time_range:
+          type: string
+          default: 24h
+
+    EventTimelineOutput:
+      type: object
+      required: [entity, events]
+      properties:
+        entity:
+          type: string
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimelineEvent'
+
+    TimelineEvent:
+      type: object
+      required: [timestamp, action, description]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        action:
+          type: string
+        description:
+          type: string
+        severity:
+          type: string
+          enum: [info, low, medium, high, critical]
+        source:
+          type: string
+
+    NormalizeIOCsInput:
+      type: object
+      required: [text]
+      properties:
+        text:
+          type: string
+          description: Raw text containing potential IOCs
+
+    NormalizeIOCsOutput:
+      type: object
+      required: [iocs]
+      properties:
+        iocs:
+          type: array
+          items:
+            $ref: '#/components/schemas/IOC'
+
+    IOC:
+      type: object
+      required: [type, value]
+      properties:
+        type:
+          type: string
+          enum: [ip, domain, url, hash_md5, hash_sha1, hash_sha256, email]
+        value:
+          type: string
+        defanged:
+          type: boolean
+
+    ParseRawLogInput:
+      type: object
+      required: [raw_log]
+      properties:
+        raw_log:
+          type: string
+        format_hint:
+          type: string
+          enum: [syslog, json, cef, leef, auto]
+          default: auto
+
+    ParseRawLogOutput:
+      type: object
+      required: [parsed, format_detected]
+      properties:
+        parsed:
+          type: object
+          additionalProperties: true
+        format_detected:
+          type: string
+        confidence:
+          type: number
+
+    # Threat Intel
+    IOCReputationInput:
+      type: object
+      required: [ioc_type, ioc_value]
+      properties:
+        ioc_type:
+          type: string
+          enum: [ip, domain, url, hash]
+        ioc_value:
+          type: string
+
+    IOCReputationOutput:
+      type: object
+      required: [ioc, verdict, risk_score, sources]
+      properties:
+        ioc:
+          type: string
+        verdict:
+          type: string
+          enum: [clean, suspicious, malicious, unknown]
+        risk_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReputationSource'
+        first_seen:
+          type: string
+          format: date-time
+        last_seen:
+          type: string
+          format: date-time
+        tags:
+          type: array
+          items:
+            type: string
+
+    ReputationSource:
+      type: object
+      required: [name, verdict]
+      properties:
+        name:
+          type: string
+        verdict:
+          type: string
+        confidence:
+          type: number
+        details:
+          type: string
+
+    MitreMapperInput:
+      type: object
+      required: [description]
+      properties:
+        description:
+          type: string
+          description: Attack behavior description
+        log_entries:
+          type: array
+          items:
+            type: string
+
+    MitreMapperOutput:
+      type: object
+      required: [techniques]
+      properties:
+        techniques:
+          type: array
+          items:
+            $ref: '#/components/schemas/MitreTechnique'
+
+    MitreTechnique:
+      type: object
+      required: [id, name, tactic, confidence]
+      properties:
+        id:
+          type: string
+          example: T1021
+        name:
+          type: string
+          example: Remote Services
+        tactic:
+          type: string
+          example: Lateral Movement
+        subtechnique:
+          type: string
+        confidence:
+          type: number
+        evidence:
+          type: string
+        url:
+          type: string
+          format: uri
+
+    GeoIPInput:
+      type: object
+      required: [ip_addresses]
+      properties:
+        ip_addresses:
+          type: array
+          items:
+            type: string
+            format: ipv4
+
+    GeoIPOutput:
+      type: object
+      required: [results]
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeoIPResult'
+
+    GeoIPResult:
+      type: object
+      required: [ip, country_code]
+      properties:
+        ip:
+          type: string
+        country_code:
+          type: string
+        country_name:
+          type: string
+        city:
+          type: string
+        region:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        asn:
+          type: integer
+        org:
+          type: string
+        is_vpn:
+          type: boolean
+        is_tor:
+          type: boolean
+
+    # Case Management
+    CreateCaseInput:
+      type: object
+      required: [title, severity]
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        description:
+          type: string
+        alert_ids:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    CreateCaseOutput:
+      type: object
+      required: [case_id, title, status, created_at]
+      properties:
+        case_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        status:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    AddCaseNoteInput:
+      type: object
+      required: [case_id, content]
+      properties:
+        case_id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        note_type:
+          type: string
+          enum: [observation, finding, action, recommendation]
+          default: observation
+
+    AddCaseNoteOutput:
+      type: object
+      required: [note_id, case_id, created_at]
+      properties:
+        note_id:
+          type: string
+          format: uuid
+        case_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+
+    GenerateReportInput:
+      type: object
+      required: [case_id]
+      properties:
+        case_id:
+          type: string
+          format: uuid
+        format:
+          type: string
+          enum: [markdown, html, pdf]
+          default: markdown
+        include_timeline:
+          type: boolean
+          default: true
+        include_iocs:
+          type: boolean
+          default: true
+
+    GenerateReportOutput:
+      type: object
+      required: [report_id, content, format]
+      properties:
+        report_id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        format:
+          type: string
+        sections:
+          type: array
+          items:
+            type: string
+
+    # RAG
+    RAGRetrieveInput:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+        current_page:
+          type: string
+          description: Current textbook page for context boost
+        selected_text:
+          type: string
+          description: User-selected text for context
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 20
+          default: 5
+        filter_module:
+          type: string
+
+    RAGRetrieveOutput:
+      type: object
+      required: [chunks]
+      properties:
+        chunks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TextbookChunk'
+
+    TextbookChunk:
+      type: object
+      required: [id, content, source_page, relevance]
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+        source_page:
+          type: string
+        module:
+          type: string
+        chapter:
+          type: string
+        title:
+          type: string
+        relevance:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    RAGEvalInput:
+      type: object
+      required: [eval_set]
+      properties:
+        eval_set:
+          type: string
+          description: Name of evaluation dataset
+        sample_size:
+          type: integer
+          default: 50
+
+    RAGEvalOutput:
+      type: object
+      required: [metrics]
+      properties:
+        metrics:
+          type: object
+          properties:
+            precision_at_5:
+              type: number
+            recall:
+              type: number
+            groundedness:
+              type: number
+            citation_accuracy:
+              type: number
+        detailed_results:
+          type: array
+          items:
+            type: object
+
+    # Safe Actions
+    RequestActionInput:
+      type: object
+      required: [action_type, params, reason]
+      properties:
+        action_type:
+          type: string
+          enum: [disable_user, isolate_host, block_ioc]
+        params:
+          type: object
+          additionalProperties: true
+        reason:
+          type: string
+          description: Agent's justification for the action
+        risk_assessment:
+          type: string
+          enum: [low, medium, high, critical]
+
+    RequestActionOutput:
+      type: object
+      required: [approval_id, status, expires_at]
+      properties:
+        approval_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending]
+        expires_at:
+          type: string
+          format: date-time
+        message:
+          type: string
+
+    ApproveActionInput:
+      type: object
+      required: [approval_id]
+      properties:
+        approval_id:
+          type: string
+          format: uuid
+
+    ApproveActionOutput:
+      type: object
+      required: [success, action_type]
+      properties:
+        success:
+          type: boolean
+        action_type:
+          type: string
+        result:
+          type: object
+          additionalProperties: true
+        error:
+          type: string
+
+    ToolError:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
