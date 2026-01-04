@@ -1,0 +1,638 @@
+openapi: 3.1.0
+info:
+  title: AI-SOC Chat API
+  description: Chat and agent interaction endpoints
+  version: 1.0.0
+  contact:
+    name: AI-SOC Platform Team
+
+servers:
+  - url: http://localhost:8000
+    description: Local development
+  - url: https://api.ai-soc.example.com
+    description: Production
+
+tags:
+  - name: chat
+    description: Chat operations
+  - name: approvals
+    description: Action approval workflow
+
+paths:
+  /chat/messages:
+    post:
+      tags: [chat]
+      summary: Send a message to the AI agent
+      operationId: sendMessage
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '200':
+          description: Agent response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /chat/messages/stream:
+    post:
+      tags: [chat]
+      summary: Send a message with streaming response
+      operationId: sendMessageStream
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '200':
+          description: Streaming agent response
+          content:
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/StreamEvent'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /chat/history:
+    get:
+      tags: [chat]
+      summary: Get chat history for current session
+      operationId: getChatHistory
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: before
+          in: query
+          description: Get messages before this message ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Chat history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatHistory'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /chat/history/clear:
+    post:
+      tags: [chat]
+      summary: Clear chat history for current session
+      operationId: clearChatHistory
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: History cleared
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /approvals:
+    get:
+      tags: [approvals]
+      summary: List pending approval requests
+      operationId: listApprovals
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, rejected, expired, all]
+            default: pending
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: List of approval requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalList'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /approvals/{approval_id}:
+    get:
+      tags: [approvals]
+      summary: Get approval request details
+      operationId: getApproval
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: approval_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Approval request details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Approval not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /approvals/{approval_id}/approve:
+    post:
+      tags: [approvals]
+      summary: Approve a pending action
+      operationId: approveAction
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: approval_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalDecision'
+      responses:
+        '200':
+          description: Action approved and executed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalResult'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions (requires senior_analyst or admin)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Approval not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Approval already resolved or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /approvals/{approval_id}/reject:
+    post:
+      tags: [approvals]
+      summary: Reject a pending action
+      operationId: rejectAction
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: approval_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalDecision'
+      responses:
+        '200':
+          description: Action rejected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalResult'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    SendMessageRequest:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 10000
+          description: User message content
+          example: "Analyze this phishing alert: suspicious login from IP 192.168.1.100"
+        context:
+          $ref: '#/components/schemas/MessageContext'
+
+    MessageContext:
+      type: object
+      properties:
+        selected_text:
+          type: string
+          description: Text selected by user in the textbook
+        current_page:
+          type: string
+          description: Current page path in the textbook
+          example: "/module-1/chapter-3/siem-basics"
+        case_id:
+          type: string
+          format: uuid
+          description: Related case ID if in incident context
+
+    ChatResponse:
+      type: object
+      required: [id, role, content, agent_name, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [assistant]
+        content:
+          type: string
+          description: Agent response content
+        agent_name:
+          type: string
+          description: Name of responding agent
+          example: TRIAGE-AGENT
+        citations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Citation'
+        tools_used:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolUsage'
+        approval_request:
+          $ref: '#/components/schemas/ApprovalRequest'
+          description: Present if action requires approval
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Agent confidence score
+        tokens_used:
+          type: integer
+          description: Total tokens consumed
+        latency_ms:
+          type: integer
+          description: Response time in milliseconds
+        created_at:
+          type: string
+          format: date-time
+
+    StreamEvent:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [start, token, citation, tool_call, approval, done, error]
+        data:
+          oneOf:
+            - $ref: '#/components/schemas/StreamStart'
+            - $ref: '#/components/schemas/StreamToken'
+            - $ref: '#/components/schemas/Citation'
+            - $ref: '#/components/schemas/ToolUsage'
+            - $ref: '#/components/schemas/ApprovalRequest'
+            - $ref: '#/components/schemas/StreamDone'
+            - $ref: '#/components/schemas/StreamError'
+
+    StreamStart:
+      type: object
+      required: [message_id, agent_name]
+      properties:
+        message_id:
+          type: string
+          format: uuid
+        agent_name:
+          type: string
+
+    StreamToken:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+          description: Partial response token
+
+    StreamDone:
+      type: object
+      required: [message_id, tokens_used, latency_ms]
+      properties:
+        message_id:
+          type: string
+          format: uuid
+        tokens_used:
+          type: integer
+        latency_ms:
+          type: integer
+
+    StreamError:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    Citation:
+      type: object
+      required: [page, chunk_id, relevance]
+      properties:
+        page:
+          type: string
+          description: Source page path
+          example: "/module-1/chapter-3/siem-basics"
+        chunk_id:
+          type: string
+          description: Chunk identifier
+        relevance:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Relevance score
+        snippet:
+          type: string
+          description: Relevant text snippet
+
+    ToolUsage:
+      type: object
+      required: [tool_name, status]
+      properties:
+        tool_name:
+          type: string
+          example: log_search
+        inputs:
+          type: object
+          additionalProperties: true
+        outputs:
+          type: object
+          additionalProperties: true
+        status:
+          type: string
+          enum: [success, error, pending_approval]
+        latency_ms:
+          type: integer
+
+    ChatHistory:
+      type: object
+      required: [messages, has_more]
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+        has_more:
+          type: boolean
+          description: Whether more messages exist
+
+    ChatMessage:
+      type: object
+      required: [id, role, content, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [user, assistant, system]
+        content:
+          type: string
+        agent_name:
+          type: string
+          nullable: true
+        citations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Citation'
+        created_at:
+          type: string
+          format: date-time
+
+    ApprovalList:
+      type: object
+      required: [approvals, total]
+      properties:
+        approvals:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovalRequest'
+        total:
+          type: integer
+
+    ApprovalRequest:
+      type: object
+      required: [id, agent_name, action_type, params, risk_assessment, status, expires_at, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        agent_name:
+          type: string
+          example: INCIDENT-COMMANDER
+        action_type:
+          type: string
+          enum: [disable_user, isolate_host, block_ioc]
+        params:
+          type: object
+          additionalProperties: true
+          example:
+            user_id: "john.doe@example.com"
+            reason: "Compromised credentials detected"
+        risk_assessment:
+          type: string
+          enum: [low, medium, high, critical]
+        reason:
+          type: string
+          description: Agent's justification for the action
+        status:
+          type: string
+          enum: [pending, approved, rejected, expired, executed]
+        requester:
+          $ref: '#/components/schemas/UserSummary'
+        resolver:
+          $ref: '#/components/schemas/UserSummary'
+          nullable: true
+        resolution_reason:
+          type: string
+          nullable: true
+        expires_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    ApprovalDecision:
+      type: object
+      properties:
+        reason:
+          type: string
+          maxLength: 500
+          description: Reason for approval/rejection
+
+    ApprovalResult:
+      type: object
+      required: [approval_id, status, resolved_at]
+      properties:
+        approval_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [approved, rejected, executed]
+        resolved_at:
+          type: string
+          format: date-time
+        execution_result:
+          type: object
+          additionalProperties: true
+          description: Result of action execution (if approved)
+
+    UserSummary:
+      type: object
+      required: [id, email]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        display_name:
+          type: string
+          nullable: true
+
+    SuccessResponse:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        message:
+          type: string
+
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+          example: RATE_LIMIT_EXCEEDED
+        message:
+          type: string
+          example: "Rate limit exceeded. Please try again in 60 seconds."
+        details:
+          type: object
+          additionalProperties: true

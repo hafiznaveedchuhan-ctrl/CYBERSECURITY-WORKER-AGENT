@@ -1,0 +1,521 @@
+openapi: 3.1.0
+info:
+  title: AI-SOC Ingestion API
+  description: Content ingestion and indexing endpoints
+  version: 1.0.0
+  contact:
+    name: AI-SOC Platform Team
+
+servers:
+  - url: http://localhost:8002
+    description: Local ingestion service
+  - url: https://ingestion.ai-soc.example.com
+    description: Production ingestion service
+
+tags:
+  - name: textbook
+    description: Textbook content ingestion
+  - name: playbook
+    description: Security playbook ingestion
+  - name: health
+    description: Service health checks
+
+paths:
+  /ingest/textbook:
+    post:
+      tags: [textbook]
+      summary: Ingest textbook content from Docusaurus
+      operationId: ingestTextbook
+      security:
+        - adminAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TextbookIngestRequest'
+      responses:
+        '202':
+          description: Ingestion job started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestJobResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /ingest/textbook/file:
+    post:
+      tags: [textbook]
+      summary: Ingest single markdown file
+      operationId: ingestTextbookFile
+      security:
+        - adminAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, source_page]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Markdown file content
+                source_page:
+                  type: string
+                  description: Target page path
+                module:
+                  type: string
+                  description: Module name
+                chapter:
+                  type: string
+                  description: Chapter name
+      responses:
+        '200':
+          description: File ingested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileIngestResponse'
+        '400':
+          description: Invalid file format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /ingest/playbook:
+    post:
+      tags: [playbook]
+      summary: Ingest security playbook content
+      operationId: ingestPlaybook
+      security:
+        - adminAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaybookIngestRequest'
+      responses:
+        '202':
+          description: Ingestion job started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestJobResponse'
+
+  /ingest/jobs/{job_id}:
+    get:
+      tags: [textbook, playbook]
+      summary: Get ingestion job status
+      operationId: getIngestJob
+      security:
+        - adminAuth: []
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Job status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestJobStatus'
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /ingest/jobs/{job_id}/cancel:
+    post:
+      tags: [textbook, playbook]
+      summary: Cancel running ingestion job
+      operationId: cancelIngestJob
+      security:
+        - adminAuth: []
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Job cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Job already completed or cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /ingest/stats:
+    get:
+      tags: [textbook, playbook]
+      summary: Get ingestion statistics
+      operationId: getIngestStats
+      security:
+        - adminAuth: []
+      responses:
+        '200':
+          description: Ingestion statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestStats'
+
+  /ingest/reindex:
+    post:
+      tags: [textbook, playbook]
+      summary: Trigger full reindexing of all content
+      operationId: reindexAll
+      security:
+        - adminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                collection:
+                  type: string
+                  enum: [textbook_chunks, playbook_chunks, all]
+                  default: all
+                force:
+                  type: boolean
+                  default: false
+                  description: Force reindex even if content unchanged
+      responses:
+        '202':
+          description: Reindex job started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestJobResponse'
+
+  /health:
+    get:
+      tags: [health]
+      summary: Service health check
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Service unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /ready:
+    get:
+      tags: [health]
+      summary: Service readiness check
+      operationId: readinessCheck
+      responses:
+        '200':
+          description: Service ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadyResponse'
+        '503':
+          description: Service not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadyResponse'
+
+components:
+  securitySchemes:
+    adminAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Admin-level JWT token
+
+  schemas:
+    TextbookIngestRequest:
+      type: object
+      required: [source]
+      properties:
+        source:
+          type: string
+          enum: [git, url, local]
+          description: Content source type
+        source_url:
+          type: string
+          format: uri
+          description: Git repo URL or base URL (required for git/url source)
+        source_path:
+          type: string
+          description: Local directory path (required for local source)
+        branch:
+          type: string
+          default: main
+          description: Git branch (for git source)
+        docs_path:
+          type: string
+          default: docs
+          description: Path to docs directory within source
+        chunk_config:
+          $ref: '#/components/schemas/ChunkConfig'
+        embedding_model:
+          type: string
+          default: text-embedding-3-small
+        incremental:
+          type: boolean
+          default: true
+          description: Only process changed files
+
+    PlaybookIngestRequest:
+      type: object
+      required: [source, playbook_type]
+      properties:
+        source:
+          type: string
+          enum: [git, url, local]
+        source_url:
+          type: string
+          format: uri
+        source_path:
+          type: string
+        playbook_type:
+          type: string
+          enum: [incident_response, threat_hunting, detection_engineering]
+        chunk_config:
+          $ref: '#/components/schemas/ChunkConfig'
+
+    ChunkConfig:
+      type: object
+      properties:
+        chunk_size:
+          type: integer
+          minimum: 100
+          maximum: 2000
+          default: 500
+          description: Target chunk size in tokens
+        chunk_overlap:
+          type: integer
+          minimum: 0
+          maximum: 500
+          default: 50
+          description: Overlap between chunks in tokens
+        separator:
+          type: string
+          default: "\n\n"
+          description: Primary text separator
+        preserve_headers:
+          type: boolean
+          default: true
+          description: Keep section headers in chunks
+
+    IngestJobResponse:
+      type: object
+      required: [job_id, status, created_at]
+      properties:
+        job_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [queued, running]
+        created_at:
+          type: string
+          format: date-time
+        estimated_files:
+          type: integer
+        message:
+          type: string
+
+    IngestJobStatus:
+      type: object
+      required: [job_id, status, created_at]
+      properties:
+        job_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [queued, running, completed, failed, cancelled]
+        created_at:
+          type: string
+          format: date-time
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+        progress:
+          $ref: '#/components/schemas/IngestProgress'
+        error:
+          type: string
+          description: Error message if status is failed
+
+    IngestProgress:
+      type: object
+      required: [total_files, processed_files, total_chunks]
+      properties:
+        total_files:
+          type: integer
+        processed_files:
+          type: integer
+        skipped_files:
+          type: integer
+        failed_files:
+          type: integer
+        total_chunks:
+          type: integer
+        indexed_chunks:
+          type: integer
+        current_file:
+          type: string
+        percent_complete:
+          type: number
+          minimum: 0
+          maximum: 100
+
+    FileIngestResponse:
+      type: object
+      required: [source_page, chunks_created, indexed]
+      properties:
+        source_page:
+          type: string
+        chunks_created:
+          type: integer
+        indexed:
+          type: boolean
+        replaced_chunks:
+          type: integer
+          description: Number of existing chunks replaced
+
+    IngestStats:
+      type: object
+      required: [collections]
+      properties:
+        collections:
+          type: array
+          items:
+            $ref: '#/components/schemas/CollectionStats'
+        last_full_ingest:
+          type: string
+          format: date-time
+        pending_jobs:
+          type: integer
+        running_jobs:
+          type: integer
+
+    CollectionStats:
+      type: object
+      required: [name, total_chunks, total_documents]
+      properties:
+        name:
+          type: string
+          example: textbook_chunks
+        total_chunks:
+          type: integer
+        total_documents:
+          type: integer
+        avg_chunk_size:
+          type: number
+        last_updated:
+          type: string
+          format: date-time
+        index_size_mb:
+          type: number
+
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+        version:
+          type: string
+        uptime_seconds:
+          type: integer
+        checks:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [pass, fail]
+              message:
+                type: string
+
+    ReadyResponse:
+      type: object
+      required: [ready]
+      properties:
+        ready:
+          type: boolean
+        dependencies:
+          type: object
+          properties:
+            qdrant:
+              type: boolean
+            postgres:
+              type: boolean
+            openai:
+              type: boolean
+
+    SuccessResponse:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        message:
+          type: string
+
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
