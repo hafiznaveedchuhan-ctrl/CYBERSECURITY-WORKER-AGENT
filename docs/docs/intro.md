@@ -1,14 +1,25 @@
 
 ---
 id: intro
-title: Welcome to AI SOC Textbook
+title: AI-SOC Platform - Next-Gen Security Operations
 sidebar_label: Introduction
 slug: /
 ---
 
-# AI-SOC Textbook
+<div className="hero hero--primary" style={{padding: '3rem 2rem', marginBottom: '2rem', borderRadius: '12px', background: 'linear-gradient(135deg, #0a0f1a 0%, #1e293b 50%, #0f172a 100%)'}}>
+  <div className="container">
+    <h1 className="hero__title" style={{background: 'linear-gradient(135deg, #ffffff 0%, #38bdf8 50%, #0ea5e9 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontSize: '2.5rem'}}>
+      AI-SOC Platform
+    </h1>
+    <p className="hero__subtitle" style={{color: '#94a3b8', fontSize: '1.2rem'}}>
+      Transform Your Security Operations with AI-Powered Agents
+    </p>
+  </div>
+</div>
 
-Welcome to the AI-powered Security Operations Center training platform. This comprehensive textbook covers everything from SOC fundamentals to advanced AI-assisted threat detection and incident response.
+# Welcome to AI-SOC
+
+The **AI-SOC Platform** is a next-generation Security Operations Center powered by artificial intelligence. This comprehensive training platform covers everything from SOC fundamentals to advanced AI-assisted threat detection and incident response.
 
 ## Course Overview
 
