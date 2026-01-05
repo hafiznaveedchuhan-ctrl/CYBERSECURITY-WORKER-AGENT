@@ -1,0 +1,102 @@
+/**
+ * AI SOC Textbook - Custom Styles
+ * Cybersecurity-themed dark mode design
+ */
+
+:root {
+  --ifm-color-primary: #2563eb;
+  --ifm-color-primary-dark: #1d4ed8;
+  --ifm-color-primary-darker: #1e40af;
+  --ifm-color-primary-darkest: #1e3a8a;
+  --ifm-color-primary-light: #3b82f6;
+  --ifm-color-primary-lighter: #60a5fa;
+  --ifm-color-primary-lightest: #93c5fd;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #3b82f6;
+  --ifm-color-primary-dark: #2563eb;
+  --ifm-color-primary-darker: #1d4ed8;
+  --ifm-color-primary-darkest: #1e40af;
+  --ifm-color-primary-light: #60a5fa;
+  --ifm-color-primary-lighter: #93c5fd;
+  --ifm-color-primary-lightest: #bfdbfe;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-background-color: #0f172a;
+  --ifm-background-surface-color: #1e293b;
+}
+
+/* Severity colors for security context */
+.severity-critical {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+.severity-high {
+  color: #ea580c;
+  font-weight: bold;
+}
+
+.severity-medium {
+  color: #ca8a04;
+}
+
+.severity-low {
+  color: #16a34a;
+}
+
+.severity-info {
+  color: #2563eb;
+}
+
+/* Agent badges */
+.agent-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.agent-triage {
+  background-color: #dc2626;
+  color: white;
+}
+
+.agent-enrichment {
+  background-color: #2563eb;
+  color: white;
+}
+
+.agent-threatintel {
+  background-color: #ea580c;
+  color: white;
+}
+
+.agent-detection {
+  background-color: #16a34a;
+  color: white;
+}
+
+.agent-incident {
+  background-color: #be185d;
+  color: white;
+}
+
+.agent-report {
+  background-color: #0891b2;
+  color: white;
+}
+
+/* Code blocks styling */
+.prism-code {
+  border-radius: 0.5rem;
+}
+
+/* Sidebar customization */
+.theme-doc-sidebar-menu {
+  font-size: 0.9rem;
+}

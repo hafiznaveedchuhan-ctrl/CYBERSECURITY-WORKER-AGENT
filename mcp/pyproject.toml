@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "ai-soc-mcp-server"
+version = "0.1.0"
+description = "AI SOC MCP Server - Security Tools Integration"
+authors = ["AI-SOC Team"]
+readme = "README.md"
+packages = [{ include = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastmcp = "^0.1.0"
+httpx = "^0.27.0"
+pydantic = "^2.6.0"
+pydantic-settings = "^2.2.0"
+python-dotenv = "^1.0.0"
+structlog = "^24.1.0"
+tenacity = "^8.2.0"
+aiofiles = "^23.2.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+pytest-asyncio = "^0.23.0"
+ruff = "^0.3.0"
+mypy = "^1.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+select = ["E", "W", "F", "I", "B", "C4", "UP", "ARG", "SIM"]
+ignore = ["E501", "B008"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

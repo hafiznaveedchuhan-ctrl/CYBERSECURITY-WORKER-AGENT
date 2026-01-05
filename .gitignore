@@ -1,0 +1,66 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.env/
+env/
+*.egg-info/
+.eggs/
+dist/
+build/
+*.whl
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.local
+
+# Build outputs
+frontend/.next/
+frontend/out/
+docs/.docusaurus/
+docs/build/
+coverage/
+*.log
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.nyc_output/
+
+# Docker
+*.tar
+
+# Kubernetes
+*.secret.yaml
+secrets/
+kubeconfig*
+
+# Terraform
+.terraform/
+*.tfstate*
+*.tfvars
+
+# Misc
+*.tmp
+*.temp
+*.bak
