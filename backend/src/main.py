@@ -9,6 +9,7 @@ import structlog
 
 from src.config import settings
 from src.api import api_router
+from src.api.middleware import RequestIdMiddleware, TimingMiddleware, RateLimitMiddleware
 
 logger = structlog.get_logger()
 
@@ -28,7 +29,15 @@ app = FastAPI(
     description="AI-powered Security Operations Center API",
     version=settings.app_version,
     lifespan=lifespan,
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
 )
+
+# Add middleware (order matters - first added is outermost)
+app.add_middleware(RateLimitMiddleware, requests_per_minute=settings.rate_limit_per_minute)
+app.add_middleware(TimingMiddleware)
+app.add_middleware(RequestIdMiddleware)
 
 # Configure CORS
 app.add_middleware(
@@ -47,3 +56,9 @@ app.include_router(api_router, prefix="/api/v1")
 async def root() -> dict[str, str]:
     """Root endpoint."""
     return {"message": "AI SOC Backend API", "version": settings.app_version}
+
+
+@app.get("/health")
+async def health() -> dict[str, str]:
+    """Health check endpoint."""
+    return {"status": "healthy"}
