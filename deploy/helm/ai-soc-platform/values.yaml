@@ -1,0 +1,193 @@
+# Default values for ai-soc-platform
+# This is an umbrella chart that deploys all components
+
+global:
+  # Image pull secrets for private registries
+  imagePullSecrets: []
+
+  # Environment (local, staging, production)
+  environment: local
+
+  # Domain configuration
+  domain: ai-soc.local
+
+  # Database configuration
+  database:
+    host: postgres
+    port: 5432
+    name: ai_soc
+    user: ai_soc_user
+    # passwordSecretName: postgres-secret
+
+  # Qdrant vector store
+  qdrant:
+    host: qdrant
+    port: 6333
+
+  # OpenAI configuration
+  openai:
+    # apiKeySecretName: openai-secret
+    model: gpt-4o
+
+# Frontend configuration
+frontend:
+  enabled: true
+  replicaCount: 2
+
+  image:
+    repository: ai-soc/frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 3000
+
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: ai-soc.local
+        paths:
+          - path: /
+            pathType: Prefix
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# Backend (chatbot-api) configuration
+backend:
+  enabled: true
+  replicaCount: 2
+
+  image:
+    repository: ai-soc/backend
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8000
+
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: api.ai-soc.local
+        paths:
+          - path: /
+            pathType: Prefix
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+  env:
+    LOG_LEVEL: INFO
+    CORS_ORIGINS: "http://ai-soc.local,https://ai-soc.local"
+
+# Docs (Docusaurus) configuration
+docs:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: ai-soc/docs
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 3001
+
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: docs.ai-soc.local
+        paths:
+          - path: /
+            pathType: Prefix
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+# MCP Server configuration
+mcp-server:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: ai-soc/mcp-server
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# RAG Service configuration
+rag-service:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: ai-soc/rag-service
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8001
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# Ingestion Service configuration
+ingestion-service:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: ai-soc/ingestion-service
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8002
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi

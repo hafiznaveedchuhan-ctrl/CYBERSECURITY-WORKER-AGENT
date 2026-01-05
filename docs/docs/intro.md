@@ -1,3 +1,4 @@
+
 ---
 id: intro
 title: Welcome to AI SOC Textbook
@@ -5,43 +6,88 @@ sidebar_label: Introduction
 slug: /
 ---
 
-# AI SOC Textbook
+# AI-SOC Textbook
 
 Welcome to the AI-powered Security Operations Center training platform. This comprehensive textbook covers everything from SOC fundamentals to advanced AI-assisted threat detection and incident response.
 
-## What You'll Learn
+## Course Overview
 
-- **SOC Fundamentals**: Understanding the security operations center, roles, and responsibilities
-- **Threat Landscape**: Modern cyber threats, attack vectors, and threat actors
-- **Detection Engineering**: Building effective detection rules with Sigma and YARA
-- **Incident Response**: Systematic approach to handling security incidents
-- **Threat Intelligence**: Gathering, analyzing, and operationalizing threat intelligence
-- **AI Agents**: Leveraging AI sub-agents for automated security operations
+This textbook is designed for security professionals who want to:
+- Understand SOC operations and best practices
+- Learn how AI agents can enhance security workflows
+- Master alert triage, incident response, and threat intelligence
+- Build and deploy AI-powered security tools
+
+## Modules
+
+### Module 1: SOC Foundations
+Learn the fundamentals of Security Operations Centers:
+- [SOC Introduction](/module-1-soc-foundations/01-introduction)
+- [Team Roles](/module-1-soc-foundations/02-team-roles)
+- [Alert Triage Process](/module-1-soc-foundations/03-alert-triage)
+- [SOC Tools](/module-1-soc-foundations/04-tools)
+- [Incident Response Basics](/module-1-soc-foundations/05-incident-response)
+
+### Module 2: Agentic AI
+Understand AI agents and their applications in security:
+- [Introduction to Agentic AI](/module-2-agentic-ai/01-introduction)
+- [Agent Architecture](/module-2-agentic-ai/02-architecture)
+
+### Module 3: AI-SOC Workflows
+Practical AI-enhanced security workflows:
+- [AI-Assisted Triage](/module-3-ai-soc-workflows/01-ai-triage)
+
+### Module 4: AI Security
+Security considerations for AI systems:
+- [AI Security Risks](/module-4-ai-security/01-risks)
 
 ## Platform Features
 
 ### Interactive Learning
-Ask questions and get AI-powered explanations tailored to your learning level.
+Highlight any text in the textbook and ask the AI for explanations. The chat widget appears on every page, ready to answer your questions.
 
-### RAG-Powered Chatbot
-Our chatbot uses Retrieval-Augmented Generation to provide accurate, context-aware answers based on the textbook content.
+### RAG-Powered Responses
+Our chatbot uses Retrieval-Augmented Generation to provide accurate, context-aware answers grounded in this textbook's content. Every response includes citations you can click to see the source.
 
 ### Domain Expert Agents
-Six specialized AI agents assist with different aspects of security operations:
+Seven specialized AI agents assist with different aspects of security operations:
 
 | Agent | Specialty |
 |-------|-----------|
-| **TRIAGE** | Initial alert assessment and prioritization |
-| **ENRICHMENT** | Data enrichment and context gathering |
-| **THREATINTEL** | Threat intelligence analysis |
-| **DETECTION-ENGINEER** | Sigma/YARA rule creation |
-| **INCIDENT-COMMANDER** | Incident response coordination |
-| **REPORT-WRITER** | Automated report generation |
+| **SUPERVISOR** | Routes requests to the right specialist |
+| **TRIAGE** | Alert classification and severity assessment |
+| **ENRICHMENT** | IOC reputation and context gathering |
+| **THREATINTEL** | MITRE ATT&CK mapping and threat analysis |
+| **DETECTION** | Sigma and YARA rule generation |
+| **INCIDENT-COMMANDER** | Response coordination and approvals |
+| **REPORT-WRITER** | Automated incident report generation |
 
 ## Getting Started
 
-Begin with the [SOC Overview](/fundamentals/soc-overview) to understand the basics, or jump directly to any topic that interests you using the sidebar navigation.
+1. **Start with Module 1** to understand SOC fundamentals
+2. **Use the chat widget** to ask questions as you read
+3. **Try the platform** at the main application to analyze real alerts
+4. **Complete each module** before moving to the next
 
 :::tip Pro Tip
-Use the AI chatbot to ask questions about any topic. It has access to all textbook content and can provide personalized explanations.
+Highlight text you don't understand and click "Ask AI" for an instant explanation. The AI will use context from the textbook to give you the most relevant answer.
 :::
+
+## Prerequisites
+
+- Basic understanding of computer networking
+- Familiarity with operating systems (Windows/Linux)
+- No prior security experience required
+
+## Estimated Time
+
+- Module 1: 4-6 hours
+- Module 2: 3-4 hours
+- Module 3: 3-4 hours
+- Module 4: 2-3 hours
+
+**Total**: ~12-17 hours
+
+---
+
+Ready to begin? Start with [Module 1: SOC Foundations](/module-1-soc-foundations/).
