@@ -1,0 +1,194 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+env:
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # Frontend CI
+  frontend:
+    name: Frontend (Next.js)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test -- --passWithNoTests
+
+  # Backend CI
+  backend:
+    name: Backend (FastAPI)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.8.0
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: backend/.venv
+          key: venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Lint with ruff
+        run: poetry run ruff check src tests
+
+      - name: Format check with ruff
+        run: poetry run ruff format --check src tests
+
+      - name: Type check with mypy
+        run: poetry run mypy src --ignore-missing-imports
+
+      - name: Test with pytest
+        run: poetry run pytest tests/ -v --cov=src --cov-report=xml
+        env:
+          DATABASE_URL: "postgresql://test:test@localhost:5432/test"
+          JWT_SECRET_KEY: "test-secret-key-for-ci-testing-only"
+
+  # Docs CI
+  docs:
+    name: Docs (Docusaurus)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+  # MCP Server CI
+  mcp:
+    name: MCP Server
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mcp
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.8.0
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: Lint with ruff
+        run: poetry run ruff check src tests
+
+      - name: Type check with mypy
+        run: poetry run mypy src --ignore-missing-imports
+
+  # Docker Build Test
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: [frontend, backend, docs, mcp]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build Docs
+        uses: docker/build-push-action@v5
+        with:
+          context: ./docs
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build MCP
+        uses: docker/build-push-action@v5
+        with:
+          context: ./mcp
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

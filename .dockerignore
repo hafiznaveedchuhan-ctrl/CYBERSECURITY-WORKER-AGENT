@@ -1,0 +1,43 @@
+# Git
+.git/
+.gitignore
+
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+.docusaurus/
+
+# IDE
+.vscode/
+.idea/
+
+# Testing
+coverage/
+.pytest_cache/
+htmlcov/
+.nyc_output/
+
+# Environment
+.env*
+*.local
+
+# Documentation
+*.md
+!README.md
+docs/
+specs/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
