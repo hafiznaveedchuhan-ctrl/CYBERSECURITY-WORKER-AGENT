@@ -1,0 +1,74 @@
+# Local development values for Minikube
+
+global:
+  environment: local
+  domain: ai-soc.local
+
+  database:
+    host: postgres
+    port: 5432
+    name: ai_soc
+    user: ai_soc_user
+
+  qdrant:
+    host: qdrant
+    port: 6333
+
+frontend:
+  replicaCount: 1
+  image:
+    pullPolicy: Never  # Use local images
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    hosts:
+      - host: ai-soc.local
+        paths:
+          - path: /
+            pathType: Prefix
+
+backend:
+  replicaCount: 1
+  image:
+    pullPolicy: Never
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: api.ai-soc.local
+        paths:
+          - path: /
+            pathType: Prefix
+  env:
+    LOG_LEVEL: DEBUG
+    CORS_ORIGINS: "*"
+
+docs:
+  replicaCount: 1
+  image:
+    pullPolicy: Never
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: docs.ai-soc.local
+        paths:
+          - path: /
+            pathType: Prefix
+
+mcp-server:
+  replicaCount: 1
+  image:
+    pullPolicy: Never
+
+rag-service:
+  replicaCount: 1
+  image:
+    pullPolicy: Never
+
+ingestion-service:
+  replicaCount: 1
+  image:
+    pullPolicy: Never

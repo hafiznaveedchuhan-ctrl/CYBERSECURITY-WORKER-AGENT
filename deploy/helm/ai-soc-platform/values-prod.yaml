@@ -1,0 +1,166 @@
+# Production values for GKE
+
+global:
+  environment: production
+  domain: ai-soc.example.com
+
+  imagePullSecrets:
+    - name: gcr-secret
+
+  database:
+    host: postgres.database.svc.cluster.local
+    port: 5432
+    name: ai_soc_prod
+    user: ai_soc_prod
+    passwordSecretName: postgres-prod-secret
+
+  qdrant:
+    host: qdrant.vector.svc.cluster.local
+    port: 6333
+    apiKeySecretName: qdrant-prod-secret
+
+  openai:
+    apiKeySecretName: openai-prod-secret
+    model: gpt-4o
+
+frontend:
+  replicaCount: 3
+  image:
+    repository: gcr.io/ai-soc-prod/frontend
+    tag: "1.0.0"
+    pullPolicy: Always
+
+  ingress:
+    enabled: true
+    className: gce
+    annotations:
+      kubernetes.io/ingress.global-static-ip-name: ai-soc-frontend-ip
+      networking.gke.io/managed-certificates: ai-soc-cert
+    hosts:
+      - host: ai-soc.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+
+backend:
+  replicaCount: 3
+  image:
+    repository: gcr.io/ai-soc-prod/backend
+    tag: "1.0.0"
+    pullPolicy: Always
+
+  ingress:
+    enabled: true
+    className: gce
+    annotations:
+      kubernetes.io/ingress.global-static-ip-name: ai-soc-api-ip
+      networking.gke.io/managed-certificates: ai-soc-api-cert
+    hosts:
+      - host: api.ai-soc.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 70
+
+  env:
+    LOG_LEVEL: INFO
+    CORS_ORIGINS: "https://ai-soc.example.com"
+
+docs:
+  replicaCount: 2
+  image:
+    repository: gcr.io/ai-soc-prod/docs
+    tag: "1.0.0"
+    pullPolicy: Always
+
+  ingress:
+    enabled: true
+    className: gce
+    annotations:
+      kubernetes.io/ingress.global-static-ip-name: ai-soc-docs-ip
+      networking.gke.io/managed-certificates: ai-soc-docs-cert
+    hosts:
+      - host: docs.ai-soc.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+mcp-server:
+  replicaCount: 2
+  image:
+    repository: gcr.io/ai-soc-prod/mcp-server
+    tag: "1.0.0"
+    pullPolicy: Always
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+rag-service:
+  replicaCount: 2
+  image:
+    repository: gcr.io/ai-soc-prod/rag-service
+    tag: "1.0.0"
+    pullPolicy: Always
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+ingestion-service:
+  replicaCount: 1
+  image:
+    repository: gcr.io/ai-soc-prod/ingestion-service
+    tag: "1.0.0"
+    pullPolicy: Always
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi

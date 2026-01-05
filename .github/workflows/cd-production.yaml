@@ -1,0 +1,188 @@
+name: CD Production
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy'
+        required: true
+        type: string
+
+env:
+  PROJECT_ID: ai-soc-prod
+  GKE_CLUSTER: ai-soc-prod-cluster
+  GKE_ZONE: us-central1-a
+  REGISTRY: gcr.io
+
+jobs:
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Version
+        run: |
+          VERSION="${{ github.event.release.tag_name || github.event.inputs.version }}"
+          if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version format: $VERSION"
+            echo "Expected format: vX.Y.Z"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+  build-and-push:
+    name: Build and Push Images
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    strategy:
+      matrix:
+        service:
+          - frontend
+          - backend
+          - docs
+          - mcp
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.PROD_WIF_PROVIDER }}
+          service_account: ${{ secrets.PROD_WIF_SERVICE_ACCOUNT }}
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io
+
+      - name: Build and Push Image
+        run: |
+          VERSION="${{ github.event.release.tag_name || github.event.inputs.version }}"
+          IMAGE_TAG="${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ matrix.service }}:${VERSION}"
+
+          docker build -t $IMAGE_TAG ./${{ matrix.service }}
+          docker push $IMAGE_TAG
+
+  security-scan:
+    name: Security Scan
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service:
+          - frontend
+          - backend
+
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.PROD_WIF_PROVIDER }}
+          service_account: ${{ secrets.PROD_WIF_SERVICE_ACCOUNT }}
+
+      - name: Run Trivy Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ matrix.service }}:${{ github.event.release.tag_name || github.event.inputs.version }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy Results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  deploy:
+    name: Deploy to Production
+    needs: [build-and-push, security-scan]
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.PROD_WIF_PROVIDER }}
+          service_account: ${{ secrets.PROD_WIF_SERVICE_ACCOUNT }}
+
+      - name: Get GKE Credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.12.0
+
+      - name: Deploy with Helm
+        run: |
+          VERSION="${{ github.event.release.tag_name || github.event.inputs.version }}"
+
+          helm upgrade --install ai-soc-platform ./deploy/helm/ai-soc-platform \
+            --namespace ai-soc-prod \
+            --create-namespace \
+            --values ./deploy/helm/ai-soc-platform/values.yaml \
+            --values ./deploy/helm/ai-soc-platform/values-prod.yaml \
+            --set global.imageTag=${VERSION} \
+            --wait \
+            --timeout 15m
+
+      - name: Verify Deployment
+        run: |
+          kubectl rollout status deployment/frontend -n ai-soc-prod --timeout=5m
+          kubectl rollout status deployment/backend -n ai-soc-prod --timeout=5m
+          kubectl rollout status deployment/docs -n ai-soc-prod --timeout=5m
+          kubectl rollout status deployment/mcp-server -n ai-soc-prod --timeout=5m
+
+      - name: Run Production Smoke Tests
+        run: |
+          # Wait for ingress to be ready
+          sleep 30
+
+          # Health checks
+          curl -f "https://api.ai-soc.example.com/health" || exit 1
+          curl -f "https://ai-soc.example.com" || exit 1
+
+          echo "Production smoke tests passed!"
+
+  notify:
+    name: Notify
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Send Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+          text: 'Production deployment ${{ job.status }}'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: env.SLACK_WEBHOOK_URL != ''
+
+      - name: Create Deployment Record
+        if: success()
+        run: |
+          VERSION="${{ github.event.release.tag_name || github.event.inputs.version }}"
+          echo "Deployed version $VERSION to production at $(date -u +%Y-%m-%dT%H:%M:%SZ)"

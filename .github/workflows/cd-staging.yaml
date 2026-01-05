@@ -1,0 +1,125 @@
+name: CD Staging
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ai-soc-staging
+  GKE_CLUSTER: ai-soc-staging-cluster
+  GKE_ZONE: us-central1-a
+  REGISTRY: gcr.io
+
+jobs:
+  build-and-push:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    strategy:
+      matrix:
+        service:
+          - frontend
+          - backend
+          - docs
+          - mcp
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io
+
+      - name: Build and Push Image
+        run: |
+          IMAGE_TAG="${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ matrix.service }}:${{ github.sha }}"
+          IMAGE_LATEST="${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ matrix.service }}:latest"
+
+          docker build -t $IMAGE_TAG -t $IMAGE_LATEST ./${{ matrix.service }}
+          docker push $IMAGE_TAG
+          docker push $IMAGE_LATEST
+
+  deploy:
+    name: Deploy to Staging
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Get GKE Credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.12.0
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install ai-soc-platform ./deploy/helm/ai-soc-platform \
+            --namespace ai-soc-staging \
+            --create-namespace \
+            --values ./deploy/helm/ai-soc-platform/values.yaml \
+            --values ./deploy/helm/ai-soc-platform/values-staging.yaml \
+            --set global.imageTag=${{ github.sha }} \
+            --wait \
+            --timeout 10m
+
+      - name: Verify Deployment
+        run: |
+          kubectl rollout status deployment/frontend -n ai-soc-staging
+          kubectl rollout status deployment/backend -n ai-soc-staging
+          kubectl rollout status deployment/docs -n ai-soc-staging
+          kubectl rollout status deployment/mcp-server -n ai-soc-staging
+
+      - name: Run Smoke Tests
+        run: |
+          FRONTEND_URL=$(kubectl get ingress frontend -n ai-soc-staging -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          API_URL=$(kubectl get ingress backend -n ai-soc-staging -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+          # Health checks
+          curl -f "http://${API_URL}/health" || exit 1
+          curl -f "http://${FRONTEND_URL}" || exit 1
+
+          echo "Smoke tests passed!"
+
+  notify:
+    name: Notify
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Send Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: env.SLACK_WEBHOOK_URL != ''
