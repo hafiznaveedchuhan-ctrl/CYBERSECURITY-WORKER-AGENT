@@ -19,11 +19,16 @@ class VectorStoreService:
     def __init__(
         self,
         url: Optional[str] = None,
+        api_key: Optional[str] = None,
         collection_name: Optional[str] = None,
     ):
         self.url = url or settings.qdrant_url
+        self.api_key = api_key or getattr(settings, 'qdrant_api_key', '')
         self.collection_name = collection_name or settings.qdrant_collection
-        self.client = QdrantClient(url=self.url)
+        if self.api_key:
+            self.client = QdrantClient(url=self.url, api_key=self.api_key)
+        else:
+            self.client = QdrantClient(url=self.url)
         self.vector_size = 1536  # OpenAI text-embedding-3-small dimension
 
     async def ensure_collection(self) -> None:

@@ -29,9 +29,13 @@ class QdrantService:
         },
     }
 
-    def __init__(self, url: Optional[str] = None):
+    def __init__(self, url: Optional[str] = None, api_key: Optional[str] = None):
         self.url = url or settings.qdrant_url
-        self.client = QdrantClient(url=self.url)
+        self.api_key = api_key or settings.qdrant_api_key
+        if self.api_key:
+            self.client = QdrantClient(url=self.url, api_key=self.api_key)
+        else:
+            self.client = QdrantClient(url=self.url)
 
     async def initialize_collections(self) -> None:
         """Initialize all required collections."""

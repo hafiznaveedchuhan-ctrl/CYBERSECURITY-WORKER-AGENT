@@ -122,3 +122,47 @@ async def get_current_superuser(
             detail="Not enough permissions",
         )
     return current_user
+
+
+async def get_current_user_optional(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    db: AsyncSession = Depends(get_db),
+) -> Optional[User]:
+    """
+    Get the current authenticated user if token is provided.
+
+    Returns None if no token is provided or token is invalid.
+    Does not raise exceptions - for optional authentication.
+    """
+    if credentials is None:
+        return None
+
+    token = credentials.credentials
+
+    try:
+        # Verify the token
+        token_data = verify_token(token, expected_type="access")
+        if token_data is None:
+            return None
+
+        # Check if session is revoked
+        token_hash = hash_token(token)
+        session_result = await db.execute(
+            select(Session).where(
+                Session.token_hash == token_hash,
+                Session.is_revoked == False,  # noqa: E712
+            )
+        )
+        session = session_result.scalar_one_or_none()
+
+        if session is None:
+            return None
+
+        # Get the user
+        user_id = int(token_data.sub)
+        user_result = await db.execute(select(User).where(User.id == user_id))
+        user = user_result.scalar_one_or_none()
+
+        return user
+    except Exception:
+        return None
