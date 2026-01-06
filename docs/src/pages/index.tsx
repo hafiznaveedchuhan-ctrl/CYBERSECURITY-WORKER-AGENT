@@ -15,12 +15,12 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
-            to="/intro">
+            to="/docs/intro">
             Get Started
           </Link>
           <Link
             className="button button--outline button--lg"
-            to="/module-1-soc-foundations"
+            to="/docs/module-1-soc-foundations"
             style={{marginLeft: '1rem', borderColor: '#38bdf8', color: '#38bdf8'}}>
             View Modules
           </Link>
@@ -35,25 +35,25 @@ const FeatureList = [
     title: 'SOC Foundations',
     icon: '🛡️',
     description: 'Learn the fundamentals of Security Operations Centers, alert triage, and incident response.',
-    link: '/module-1-soc-foundations',
+    link: '/docs/module-1-soc-foundations',
   },
   {
     title: 'AI-Powered Agents',
     icon: '🤖',
     description: 'Understand how AI agents enhance security workflows with intelligent automation.',
-    link: '/module-2-agentic-ai',
+    link: '/docs/module-2-agentic-ai',
   },
   {
     title: 'AI-SOC Workflows',
     icon: '⚡',
     description: 'Master AI-assisted triage, threat detection, and automated response strategies.',
-    link: '/module-3-ai-soc-workflows',
+    link: '/docs/module-3-ai-soc-workflows',
   },
   {
     title: 'AI Security',
     icon: '🔒',
     description: 'Learn about AI security risks, adversarial attacks, and defense strategies.',
-    link: '/module-4-ai-security',
+    link: '/docs/module-4-ai-security',
   },
 ];
 

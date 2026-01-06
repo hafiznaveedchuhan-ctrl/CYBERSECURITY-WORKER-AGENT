@@ -3,7 +3,6 @@
 id: intro
 title: AI-SOC Platform - Next-Gen Security Operations
 sidebar_label: Introduction
-slug: /
 ---
 
 <div className="hero hero--primary" style={{padding: '3rem 2rem', marginBottom: '2rem', borderRadius: '12px', background: 'linear-gradient(135deg, #0a0f1a 0%, #1e293b 50%, #0f172a 100%)'}}>

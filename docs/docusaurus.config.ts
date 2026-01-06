@@ -30,7 +30,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          routeBasePath: '/',
+          routeBasePath: 'docs',
           editUrl: 'https://github.com/hafiznaveedchuhan-ctrl/CYBERSECURITY-WORKER-AGENT/tree/master/docs/',
         },
         blog: false,
@@ -71,12 +71,12 @@ const config: Config = {
           label: '📚 Learn',
         },
         {
-          to: '/module-1-soc-foundations/',
+          to: '/docs/module-1-soc-foundations/',
           label: '🛡️ SOC Foundations',
           position: 'left',
         },
         {
-          to: '/module-2-agentic-ai/',
+          to: '/docs/module-2-agentic-ai/',
           label: '🤖 AI Agents',
           position: 'left',
         },
@@ -95,15 +95,15 @@ const config: Config = {
           items: [
             {
               label: 'Introduction',
-              to: '/',
+              to: '/docs/intro',
             },
             {
               label: 'SOC Foundations',
-              to: '/module-1-soc-foundations/',
+              to: '/docs/module-1-soc-foundations/',
             },
             {
               label: 'AI Agents',
-              to: '/module-2-agentic-ai/',
+              to: '/docs/module-2-agentic-ai/',
             },
           ],
         },
@@ -112,11 +112,11 @@ const config: Config = {
           items: [
             {
               label: 'AI-SOC Workflows',
-              to: '/module-3-ai-soc-workflows/',
+              to: '/docs/module-3-ai-soc-workflows/',
             },
             {
               label: 'AI Security',
-              to: '/module-4-ai-security/',
+              to: '/docs/module-4-ai-security/',
             },
           ],
         },
