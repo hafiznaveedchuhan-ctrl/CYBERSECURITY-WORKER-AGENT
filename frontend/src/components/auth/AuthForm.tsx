@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/lib/auth';
+import { useToast } from '@/components/ui/toast';
 
 interface AuthFormProps {
   mode: 'login' | 'signup';
@@ -14,6 +15,7 @@ interface AuthFormProps {
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
   const { login, signup } = useAuth();
+  const { showToast } = useToast();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,13 +41,36 @@ export function AuthForm({ mode }: AuthFormProps) {
           setIsLoading(false);
           return;
         }
-        await signup(email, password, fullName || undefined);
+        // Register the user but don't auto-login
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        const response = await fetch(`${apiUrl}/api/v1/auth/signup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, full_name: fullName || null }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || 'Registration failed');
+        }
+
+        showToast('Account created successfully!', 'success');
+        // Wait a moment for user to see the toast, then redirect to login
+        setTimeout(() => {
+          router.push('/login');
+        }, 1500);
+        return;
       } else {
         await login(email, password);
+        showToast('Successfully logged in!', 'success');
+        // Wait a moment for user to see the toast, then redirect to chat
+        setTimeout(() => {
+          router.push('/chat');
+        }, 1000);
       }
-      router.push('/chat');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
+      showToast(err instanceof Error ? err.message : 'An error occurred', 'error');
     } finally {
       setIsLoading(false);
     }

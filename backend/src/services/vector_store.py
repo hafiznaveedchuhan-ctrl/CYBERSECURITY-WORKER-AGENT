@@ -77,34 +77,39 @@ class VectorStoreService:
         filter_conditions: Optional[dict] = None,
     ) -> list[dict]:
         """Search for similar vectors."""
-        query_filter = None
-        if filter_conditions:
-            query_filter = models.Filter(
-                must=[
-                    models.FieldCondition(
-                        key=key,
-                        match=models.MatchValue(value=value),
-                    )
-                    for key, value in filter_conditions.items()
-                ]
+        try:
+            query_filter = None
+            if filter_conditions:
+                query_filter = models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key=key,
+                            match=models.MatchValue(value=value),
+                        )
+                        for key, value in filter_conditions.items()
+                    ]
+                )
+
+            # Use query_points for qdrant-client >= 1.7.0
+            results = self.client.query_points(
+                collection_name=self.collection_name,
+                query=query_vector,
+                limit=limit,
+                score_threshold=score_threshold,
+                query_filter=query_filter,
             )
 
-        results = self.client.search(
-            collection_name=self.collection_name,
-            query_vector=query_vector,
-            limit=limit,
-            score_threshold=score_threshold,
-            query_filter=query_filter,
-        )
-
-        return [
-            {
-                "id": str(result.id),
-                "score": result.score,
-                "payload": result.payload,
-            }
-            for result in results
-        ]
+            return [
+                {
+                    "id": str(result.id),
+                    "score": result.score,
+                    "payload": result.payload,
+                }
+                for result in results.points
+            ]
+        except Exception as e:
+            logger.warning("Vector search failed, returning empty results", error=str(e))
+            return []
 
     async def delete_by_filter(self, filter_conditions: dict) -> None:
         """Delete vectors matching filter conditions."""

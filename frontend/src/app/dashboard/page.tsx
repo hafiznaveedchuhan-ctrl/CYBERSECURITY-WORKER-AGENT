@@ -204,12 +204,18 @@ export default function DashboardPage() {
               <QuickActionButton
                 label="Analyze Alert"
                 icon="🔍"
-                onClick={() => setShowChat(true)}
+                onClick={() => {
+                  setShowChat(true);
+                  alert('AI Assistant opened! Paste your security alert for analysis.');
+                }}
               />
               <QuickActionButton
                 label="Generate Report"
                 icon="📝"
-                onClick={() => setShowChat(true)}
+                onClick={() => {
+                  setShowChat(true);
+                  alert('AI Assistant opened! Ask to generate an incident report.');
+                }}
               />
               <QuickActionButton
                 label="Search IOCs"
@@ -219,7 +225,7 @@ export default function DashboardPage() {
               <QuickActionButton
                 label="View Textbook"
                 icon="📚"
-                onClick={() => router.push('/docs')}
+                onClick={() => window.open('https://hafiznaveedchuhan-ctrl.github.io/CYBERSECURITY-WORKER-AGENT/', '_blank')}
               />
             </div>
           </section>

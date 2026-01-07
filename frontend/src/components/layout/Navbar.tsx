@@ -11,25 +11,25 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-cyan-500/10 bg-slate-900/80 backdrop-blur-xl">
+    <nav className="sticky top-0 z-50 border-b border-gradient-to-r from-cyan-500/20 via-purple-500/10 to-cyan-500/20 bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl shadow-xl shadow-cyan-500/10">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative">
-              <div className="absolute inset-0 bg-cyan-500 blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-              <div className="relative h-10 w-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg">
-                <Shield className="h-6 w-6 text-white" />
+              <div className="absolute inset-0 bg-cyan-500 blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative h-10 w-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg group-hover:shadow-2xl group-hover:shadow-cyan-500/50 transition-all duration-300">
+                <Shield className="h-6 w-6 text-white group-hover:scale-110 transition-transform duration-300" />
               </div>
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-lg gradient-text">AI-SOC</span>
-              <span className="text-[10px] text-slate-400 -mt-1">Security Platform</span>
+              <span className="font-bold text-lg gradient-text group-hover:opacity-80 transition-opacity">AI-SOC Employ</span>
+              <span className="text-[10px] text-cyan-400/70 -mt-1">Next-Gen Security</span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-1 bg-gradient-to-r from-slate-900/50 to-slate-800/30 rounded-2xl p-1.5 border border-cyan-500/20 backdrop-blur-md hover:border-cyan-500/40 transition-all duration-300">
             <NavLink href="/chat" icon={<MessageSquare className="h-4 w-4" />}>
               AI Chat
             </NavLink>
@@ -49,7 +49,7 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
               <>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/50 border border-slate-700/50">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 hover:border-cyan-400/50 transition-all duration-300">
                   <User className="h-4 w-4 text-cyan-400" />
                   <span className="text-sm text-slate-300">{user?.email}</span>
                 </div>
@@ -57,7 +57,7 @@ export function Navbar() {
                   variant="ghost"
                   size="sm"
                   onClick={() => logout()}
-                  className="text-slate-400 hover:text-white hover:bg-slate-800"
+                  className="text-slate-400 hover:text-white hover:bg-slate-800/80 rounded-lg transition-all duration-300"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
@@ -65,10 +65,10 @@ export function Navbar() {
               </>
             ) : (
               <>
-                <Button variant="ghost" size="sm" asChild className="text-slate-300 hover:text-white hover:bg-slate-800">
+                <Button variant="ghost" size="sm" asChild className="text-slate-300 hover:text-cyan-400 hover:bg-slate-800/50 rounded-lg transition-all duration-300">
                   <Link href="/login">Login</Link>
                 </Button>
-                <Button size="sm" asChild className="cyber-btn text-white border-0">
+                <Button size="sm" asChild className="cyber-btn text-white border-0 rounded-lg">
                   <Link href="/signup">Sign Up Free</Link>
                 </Button>
               </>

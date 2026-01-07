@@ -1,6 +1,7 @@
 """Alembic environment configuration."""
 
 import asyncio
+import re
 from logging.config import fileConfig
 
 from sqlalchemy import pool
@@ -11,16 +12,23 @@ from alembic import context
 
 from src.config import settings
 from src.db.base import Base
-from src.models import Conversation, Message, Document, DocumentChunk  # noqa: F401
+from src.models import (  # noqa: F401
+    Conversation, Message, Document, DocumentChunk,
+    User, Session, AuditLog, AgentRun, ApprovalRequest
+)
 
 # Alembic Config object
 config = context.config
 
+# Convert database URL for asyncpg compatibility
+db_url = settings.database_url.replace("postgresql://", "postgresql+asyncpg://")
+db_url = db_url.replace("sslmode=", "ssl=")
+# Remove channel_binding parameter as asyncpg doesn't support it
+if "channel_binding=" in db_url:
+    db_url = re.sub(r"[&?]channel_binding=[^&]*", "", db_url)
+
 # Set database URL from settings
-config.set_main_option(
-    "sqlalchemy.url",
-    settings.database_url.replace("postgresql://", "postgresql+asyncpg://"),
-)
+config.set_main_option("sqlalchemy.url", db_url)
 
 # Interpret the config file for Python logging
 if config.config_file_name is not None:

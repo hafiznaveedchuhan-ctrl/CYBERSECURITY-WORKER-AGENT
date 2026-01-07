@@ -29,7 +29,7 @@ export function Footer() {
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed mb-4">
               AI-powered Security Operations Center Platform. Transform your cybersecurity
-              workflow with intelligent threat detection, automated triage, and expert AI agents.
+              workflow with intelligent threat detection, automated triage, and expert AI Employs.
             </p>
             <div className="flex gap-3">
               <SocialLink href="https://github.com/hafiznaveedchuhan-ctrl" icon={<Github className="h-5 w-5" />} label="GitHub" />
@@ -65,7 +65,7 @@ export function Footer() {
                 SOC Foundations
               </FooterLink>
               <FooterLink href="https://hafiznaveedchuhan-ctrl.github.io/CYBERSECURITY-WORKER-AGENT/docs/module-2-agentic-ai" external>
-                AI Agents
+                AI Employs
               </FooterLink>
               <FooterLink href="https://hafiznaveedchuhan-ctrl.github.io/CYBERSECURITY-WORKER-AGENT/docs/module-3-ai-soc-workflows" external>
                 AI Workflows
@@ -76,11 +76,11 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* AI Agents */}
+          {/* AI Employs */}
           <div>
             <h4 className="font-semibold text-white mb-4 flex items-center gap-2">
               <span className="h-1 w-4 bg-green-500 rounded-full" />
-              AI Agents
+              AI Employs
             </h4>
             <div className="grid grid-cols-2 gap-2">
               <AgentBadge name="Supervisor" color="cyan" />
