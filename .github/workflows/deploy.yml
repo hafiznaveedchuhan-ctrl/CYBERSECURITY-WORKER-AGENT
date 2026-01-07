@@ -39,8 +39,8 @@ jobs:
       - name: Build
         working-directory: frontend
         env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'https://cybersecurity-worker-agent.onrender.com' }}
-          NEXT_PUBLIC_DOCS_URL: 'https://hafiznaveedchuhan-ctrl.github.io/CYBERSECURITY-WORKER-AGENT/'
+          NEXT_PUBLIC_API_URL: https://cybersecurity-worker-agent.onrender.com
+          NEXT_PUBLIC_DOCS_URL: https://hafiznaveedchuhan-ctrl.github.io/CYBERSECURITY-WORKER-AGENT/
         run: npm run build
 
       - name: Upload artifact
