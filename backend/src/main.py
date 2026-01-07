@@ -39,10 +39,10 @@ app.add_middleware(RateLimitMiddleware, requests_per_minute=settings.rate_limit_
 app.add_middleware(TimingMiddleware)
 app.add_middleware(RequestIdMiddleware)
 
-# Configure CORS
+# Configure CORS - Allow all origins for now (can be restricted later)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
