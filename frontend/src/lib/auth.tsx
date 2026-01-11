@@ -13,6 +13,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -28,6 +29,7 @@ const REFRESH_TOKEN_KEY = 'ai_soc_refresh_token';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const getToken = () => {
@@ -46,8 +48,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const fetchUser = useCallback(async () => {
-    const token = getToken();
-    if (!token) {
+    const currentToken = getToken();
+    setToken(currentToken);
+    if (!currentToken) {
       setUser(null);
       setIsLoading(false);
       return;
@@ -56,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/me`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${currentToken}`,
         },
       });
 
@@ -66,11 +69,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         clearTokens();
         setUser(null);
+        setToken(null);
       }
     } catch (error) {
       console.error('Failed to fetch user:', error);
       clearTokens();
       setUser(null);
+      setToken(null);
     } finally {
       setIsLoading(false);
     }
@@ -122,13 +127,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    const token = getToken();
-    if (token) {
+    const currentToken = getToken();
+    if (currentToken) {
       try {
         await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/logout`, {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${currentToken}`,
           },
         });
       } catch (error) {
@@ -138,6 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     clearTokens();
     setUser(null);
+    setToken(null);
   };
 
   const refreshAuth = async () => {
@@ -168,6 +174,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        token,
         isLoading,
         isAuthenticated: !!user,
         login,
