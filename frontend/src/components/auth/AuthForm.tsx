@@ -57,15 +57,15 @@ export function AuthForm({ mode }: AuthFormProps) {
         showToast('Account created successfully!', 'success');
         // Wait a moment for user to see the toast, then redirect to login
         setTimeout(() => {
-          router.push('/login');
+          window.location.href = '/CYBERSECURITY-WORKER-AGENT/login';
         }, 1500);
         return;
       } else {
         await login(email, password);
         showToast('Successfully logged in!', 'success');
-        // Wait a moment for user to see the toast, then redirect to chat
+        // Wait a moment for user to see the toast, then redirect to dashboard
         setTimeout(() => {
-          router.push('/chat');
+          window.location.href = '/CYBERSECURITY-WORKER-AGENT/dashboard';
         }, 1000);
       }
     } catch (err) {
