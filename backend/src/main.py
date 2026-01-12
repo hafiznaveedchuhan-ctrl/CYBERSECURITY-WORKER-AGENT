@@ -1,5 +1,6 @@
 """AI SOC Backend - Main FastAPI Application."""
 
+import subprocess
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
@@ -14,10 +15,28 @@ from src.api.middleware import RequestIdMiddleware, TimingMiddleware, RateLimitM
 logger = structlog.get_logger()
 
 
+def run_migrations():
+    """Run database migrations on startup."""
+    try:
+        logger.info("Running database migrations...")
+        result = subprocess.run(
+            ["alembic", "upgrade", "head"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        logger.info("Migrations completed", output=result.stdout)
+    except subprocess.CalledProcessError as e:
+        logger.error("Migration failed", error=e.stderr)
+    except Exception as e:
+        logger.error("Migration error", error=str(e))
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan handler for startup and shutdown events."""
-    # Startup
+    # Startup - run migrations first
+    run_migrations()
     logger.info("Starting AI SOC Backend", version=settings.app_version)
     yield
     # Shutdown
