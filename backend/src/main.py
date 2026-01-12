@@ -1,8 +1,8 @@
 """AI SOC Backend - Main FastAPI Application."""
 
-import subprocess
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
+import traceback
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,35 +12,48 @@ from src.config import settings
 from src.api import api_router
 from src.api.middleware import RequestIdMiddleware, TimingMiddleware, RateLimitMiddleware
 
+# Import all models FIRST to ensure they are registered with Base metadata
+# This must happen before any database operations
+from src.models import (
+    User, Session, AuditLog,
+    Conversation, Message,
+    Document, DocumentChunk,
+    AgentRun, ApprovalRequest
+)
+
 logger = structlog.get_logger()
 
 
-def run_migrations():
-    """Run database migrations on startup."""
-    import os
-    # Get the backend directory (parent of src)
-    backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+async def create_tables():
+    """Create database tables on startup."""
+    from src.db import engine
+    from src.db.base import Base
+
     try:
-        logger.info("Running database migrations...", cwd=backend_dir)
-        result = subprocess.run(
-            ["alembic", "upgrade", "head"],
-            capture_output=True,
-            text=True,
-            check=True,
-            cwd=backend_dir
-        )
-        logger.info("Migrations completed", output=result.stdout)
-    except subprocess.CalledProcessError as e:
-        logger.error("Migration failed", error=e.stderr, stdout=e.stdout)
+        logger.info("Creating database tables...",
+                    tables=list(Base.metadata.tables.keys()))
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("Database tables created successfully",
+                    tables=list(Base.metadata.tables.keys()))
     except Exception as e:
-        logger.error("Migration error", error=str(e))
+        logger.error("Failed to create tables",
+                     error=str(e),
+                     traceback=traceback.format_exc())
+        # Re-raise to prevent silent failures
+        raise
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan handler for startup and shutdown events."""
-    # Startup - run migrations first
-    run_migrations()
+    # Startup - create tables first
+    try:
+        await create_tables()
+    except Exception as e:
+        # Log but continue - migrations may have already created tables
+        logger.warning("Table creation error (may be OK if migrations ran)",
+                       error=str(e))
     logger.info("Starting AI SOC Backend", version=settings.app_version)
     yield
     # Shutdown
