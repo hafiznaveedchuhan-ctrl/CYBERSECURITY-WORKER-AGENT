@@ -31,39 +31,49 @@ async def signup(
     db: AsyncSession = Depends(get_db),
 ) -> User:
     """Register a new user."""
-    # Check if email already exists
-    result = await db.execute(select(User).where(User.email == user_data.email))
-    if result.scalar_one_or_none():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered",
+    import traceback
+    try:
+        # Check if email already exists
+        result = await db.execute(select(User).where(User.email == user_data.email))
+        if result.scalar_one_or_none():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered",
+            )
+
+        # Create user
+        user = User(
+            email=user_data.email,
+            hashed_password=hash_password(user_data.password),
+            full_name=user_data.full_name,
         )
+        db.add(user)
+        await db.flush()
 
-    # Create user
-    user = User(
-        email=user_data.email,
-        hashed_password=hash_password(user_data.password),
-        full_name=user_data.full_name,
-    )
-    db.add(user)
-    await db.flush()
+        # Audit log
+        audit = AuditLog(
+            user_id=user.id,
+            action="signup",
+            resource_type="user",
+            resource_id=str(user.id),
+            ip_address=request.client.host if request.client else None,
+            user_agent=request.headers.get("user-agent"),
+        )
+        db.add(audit)
 
-    # Audit log
-    audit = AuditLog(
-        user_id=user.id,
-        action="signup",
-        resource_type="user",
-        resource_id=str(user.id),
-        ip_address=request.client.host if request.client else None,
-        user_agent=request.headers.get("user-agent"),
-    )
-    db.add(audit)
+        await db.commit()
+        await db.refresh(user)
 
-    await db.commit()
-    await db.refresh(user)
-
-    logger.info("User registered", user_id=user.id, email=user.email)
-    return user
+        logger.info("User registered", user_id=user.id, email=user.email)
+        return user
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("Signup error", error=str(e), traceback=traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Signup failed: {str(e)}"
+        )
 
 
 @router.post("/login", response_model=Token)
