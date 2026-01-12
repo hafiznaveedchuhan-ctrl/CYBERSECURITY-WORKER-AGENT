@@ -17,17 +17,21 @@ logger = structlog.get_logger()
 
 def run_migrations():
     """Run database migrations on startup."""
+    import os
+    # Get the backend directory (parent of src)
+    backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     try:
-        logger.info("Running database migrations...")
+        logger.info("Running database migrations...", cwd=backend_dir)
         result = subprocess.run(
             ["alembic", "upgrade", "head"],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
+            cwd=backend_dir
         )
         logger.info("Migrations completed", output=result.stdout)
     except subprocess.CalledProcessError as e:
-        logger.error("Migration failed", error=e.stderr)
+        logger.error("Migration failed", error=e.stderr, stdout=e.stdout)
     except Exception as e:
         logger.error("Migration error", error=str(e))
 
