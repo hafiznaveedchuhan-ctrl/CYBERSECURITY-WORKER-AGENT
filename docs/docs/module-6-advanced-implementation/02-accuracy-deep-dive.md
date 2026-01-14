@@ -1,5 +1,5 @@
 ---
-id: chapter-2
+id: 02-accuracy-deep-dive
 title: Chapter 2
 sidebar_position: 2
 ---

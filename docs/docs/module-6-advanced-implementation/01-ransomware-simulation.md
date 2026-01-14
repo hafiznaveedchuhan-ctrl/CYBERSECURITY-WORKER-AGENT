@@ -1,6 +1,6 @@
 ---
-id: chapter-1
-title: Chapter 1
+id: 01-ransomware-simulation
+title: Chapter 1 - Ransomware Attack Simulation
 sidebar_position: 1
 ---
 

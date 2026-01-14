@@ -1,5 +1,5 @@
 ---
-id: chapter-1
+id: 01-continuous-learning
 title: Chapter 1
 sidebar_position: 1
 ---

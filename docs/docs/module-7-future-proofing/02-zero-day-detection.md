@@ -1,5 +1,5 @@
 ---
-id: chapter-2
+id: 02-zero-day-detection
 title: Chapter 2
 sidebar_position: 2
 ---

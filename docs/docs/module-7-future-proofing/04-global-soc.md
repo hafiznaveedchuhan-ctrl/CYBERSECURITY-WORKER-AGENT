@@ -1,5 +1,5 @@
 ---
-id: chapter-4
+id: 04-global-soc
 title: Chapter 4
 sidebar_position: 4
 ---

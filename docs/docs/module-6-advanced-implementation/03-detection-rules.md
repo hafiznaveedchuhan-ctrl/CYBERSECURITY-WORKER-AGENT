@@ -1,5 +1,5 @@
 ---
-id: chapter-3
+id: 03-detection-rules
 title: Chapter 3
 sidebar_position: 3
 ---

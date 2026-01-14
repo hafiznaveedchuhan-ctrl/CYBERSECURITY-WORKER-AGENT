@@ -1,5 +1,5 @@
 ---
-id: chapter-4
+id: 04-compliance
 title: Chapter 4
 sidebar_position: 4
 ---

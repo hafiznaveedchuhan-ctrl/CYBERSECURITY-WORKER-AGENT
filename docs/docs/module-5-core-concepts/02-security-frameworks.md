@@ -1,5 +1,5 @@
 ---
-id: chapter-2
+id: 02-security-frameworks
 title: Chapter 2 - Security Frameworks & Standards
 sidebar_position: 2
 ---
