@@ -14,7 +14,7 @@ The "95% accuracy" claim requires deconstruction across 4 distinct metrics:
 
 **Definition**: Of all actual threat events, what percentage does our system detect?
 
-$$TPR = \frac{TP}{TP + FN} = \frac{\text{Threats Detected}}{\text{Total Threats}} = 0.96$$
+**Formula**: TPR = Threats Detected / Total Threats = **0.96 (96%)**
 
 **In Practice**:
 - Out of 1,000 actual ransomware campaigns, we detect 960
@@ -34,7 +34,7 @@ $$TPR = \frac{TP}{TP + FN} = \frac{\text{Threats Detected}}{\text{Total Threats}
 
 **Definition**: Of all benign events, what percentage are incorrectly flagged as threats?
 
-$$FPR = \frac{FP}{FP + TN} = \frac{\text{False Alarms}}{\text{Total Benign Events}} = 0.02$$
+**Formula**: FPR = False Alarms / Total Benign Events = **0.02 (2%)**
 
 **In Practice**:
 - Out of 10,000 normal system behaviors, 200 are incorrectly flagged as threats
@@ -63,7 +63,7 @@ Analyst Time Saved:
 
 **Definition**: Of all alerts we generate, what percentage are actual threats?
 
-$$Precision = \frac{TP}{TP + FP} = \frac{\text{True Threats}}{\\All Alerts} = 0.97$$
+**Formula**: Precision = True Threats / All Alerts = **0.97 (97%)**
 
 **In Practice**:
 - Out of 1,000 alerts our system generates, 970 are real threats
@@ -80,7 +80,7 @@ $$Precision = \frac{TP}{TP + FP} = \frac{\text{True Threats}}{\\All Alerts} = 0.
 
 **Definition**: Balanced metric combining precision and recall
 
-$$F1 = 2 \times \frac{Precision \times Recall}{Precision + Recall} = 2 \times \frac{0.97 \times 0.96}{0.97 + 0.96} = 0.965$$
+**Formula**: F1 = 2 × (Precision × Recall) / (Precision + Recall) = **0.965**
 
 **Interpretation**:
 - Ranges from 0 (worst) to 1 (perfect)

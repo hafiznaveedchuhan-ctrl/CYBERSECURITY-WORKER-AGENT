@@ -469,7 +469,7 @@ rule LockBit_Ransomware_Signature {
 **Detection Deployment**:
 - ✓ Sigma rule deployed to SIEM (immediate effect)
 - ✓ YARA rule distributed to all endpoints (EDR agents)
-- ✓ Detection tuned for 95% TPR, <2% FPR
+- ✓ Detection tuned for 95% TPR, under 2% FPR
 
 **⏱️ Elapsed Time: 1,850ms | Next Step: Incident Response**
 

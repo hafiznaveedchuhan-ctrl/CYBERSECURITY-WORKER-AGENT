@@ -14,7 +14,7 @@ This module transforms theoretical AI SOC architecture into production-grade ope
 
 By the end of this module, you will understand:
 
-- How coordinated AIs respond to ransomware attacks in <2 seconds
+- How coordinated AIs respond to ransomware attacks in under 2 seconds
 - Technical basis for 95% detection accuracy across 4 metrics
 - Production-grade Sigma and YARA detection rule creation
 - SOC 2 compliant infrastructure design
