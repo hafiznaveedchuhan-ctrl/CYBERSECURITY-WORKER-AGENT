@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { LucideIcon } from 'lucide-react';
 import {
   BookOpen,
   ChevronRight,
@@ -21,8 +22,26 @@ import {
   FileText
 } from 'lucide-react';
 
+// Type definitions
+interface Chapter {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+}
+
+interface Module {
+  id: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  color: string;
+  duration: string;
+  chapters: Chapter[];
+}
+
 // Module data structure
-const modules = [
+const modules: Module[] = [
   {
     id: 'module-1-soc-foundations',
     title: 'Module 1: SOC Foundations',
@@ -653,14 +672,14 @@ export default function DocsPage() {
                 <div className="mt-8 pt-6 border-t border-cyan-500/20 flex justify-between">
                   <PrevNextButton
                     direction="prev"
-                    modules={modules}
+                    allModules={modules}
                     currentModule={currentModule!}
                     currentChapter={currentChapter}
                     onNavigate={setSelectedChapter}
                   />
                   <PrevNextButton
                     direction="next"
-                    modules={modules}
+                    allModules={modules}
                     currentModule={currentModule!}
                     currentChapter={currentChapter}
                     onNavigate={setSelectedChapter}
@@ -742,38 +761,38 @@ function formatMarkdown(content: string): string {
 
 function PrevNextButton({
   direction,
-  modules,
+  allModules,
   currentModule,
   currentChapter,
   onNavigate
 }: {
   direction: 'prev' | 'next';
-  modules: typeof modules;
-  currentModule: typeof modules[0];
-  currentChapter: typeof modules[0]['chapters'][0];
+  allModules: Module[];
+  currentModule: Module;
+  currentChapter: Chapter;
   onNavigate: (nav: { moduleId: string; chapterId: string }) => void;
 }) {
   // Find prev/next chapter
-  const currentModuleIndex = modules.findIndex(m => m.id === currentModule.id);
+  const currentModuleIndex = allModules.findIndex(m => m.id === currentModule.id);
   const currentChapterIndex = currentModule.chapters.findIndex(c => c.id === currentChapter.id);
 
-  let targetModule: typeof modules[0] | undefined;
-  let targetChapter: typeof modules[0]['chapters'][0] | undefined;
+  let targetModule: Module | undefined;
+  let targetChapter: Chapter | undefined;
 
   if (direction === 'prev') {
     if (currentChapterIndex > 0) {
       targetModule = currentModule;
       targetChapter = currentModule.chapters[currentChapterIndex - 1];
     } else if (currentModuleIndex > 0) {
-      targetModule = modules[currentModuleIndex - 1];
+      targetModule = allModules[currentModuleIndex - 1];
       targetChapter = targetModule.chapters[targetModule.chapters.length - 1];
     }
   } else {
     if (currentChapterIndex < currentModule.chapters.length - 1) {
       targetModule = currentModule;
       targetChapter = currentModule.chapters[currentChapterIndex + 1];
-    } else if (currentModuleIndex < modules.length - 1) {
-      targetModule = modules[currentModuleIndex + 1];
+    } else if (currentModuleIndex < allModules.length - 1) {
+      targetModule = allModules[currentModuleIndex + 1];
       targetChapter = targetModule.chapters[0];
     }
   }
