@@ -63,6 +63,29 @@ const sidebars: SidebarsConfig = {
         'incident-response/ir-process',
       ],
     },
+    {
+      type: 'category',
+      label: 'Module 6: Advanced Implementation',
+      items: [
+        'module-6-advanced-implementation/index',
+        'module-6-advanced-implementation/01-ransomware-simulation',
+        'module-6-advanced-implementation/02-accuracy-deep-dive',
+        'module-6-advanced-implementation/03-detection-rules',
+        'module-6-advanced-implementation/04-compliance',
+        'module-6-advanced-implementation/05-reporting',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Module 7: Future-Proofing',
+      items: [
+        'module-7-future-proofing/index',
+        'module-7-future-proofing/01-continuous-learning',
+        'module-7-future-proofing/02-zero-day-detection',
+        'module-7-future-proofing/03-threat-actor-evolution',
+        'module-7-future-proofing/04-global-soc',
+      ],
+    },
   ],
 };
 
