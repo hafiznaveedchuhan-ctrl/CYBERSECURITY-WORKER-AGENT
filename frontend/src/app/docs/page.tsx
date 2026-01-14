@@ -734,7 +734,7 @@ function formatMarkdown(content: string): string {
 
   // Wrap tables
   if (html.includes('<tr>')) {
-    html = html.replace(/(<tr>.*?<\/tr>)+/gs, '<table>$&</table>');
+    html = html.replace(/(<tr>[\s\S]*?<\/tr>)+/g, '<table>$&</table>');
   }
 
   return `<p>${html}</p>`;
