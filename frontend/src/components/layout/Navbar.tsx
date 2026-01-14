@@ -37,9 +37,8 @@ export function Navbar() {
               Dashboard
             </NavLink>
             <NavLink
-              href={process.env.NEXT_PUBLIC_DOCS_URL || 'https://hafiznaveedchuhan-ctrl.github.io/CYBERSECURITY-WORKER-AGENT/'}
+              href="/docs"
               icon={<BookOpen className="h-4 w-4" />}
-              external
             >
               Docs
             </NavLink>
@@ -99,7 +98,7 @@ export function Navbar() {
                 <Shield className="h-5 w-5" /> Dashboard
               </MobileNavLink>
               <MobileNavLink
-                href={process.env.NEXT_PUBLIC_DOCS_URL || 'https://hafiznaveedchuhan-ctrl.github.io/CYBERSECURITY-WORKER-AGENT/'}
+                href="/docs"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <BookOpen className="h-5 w-5" /> Documentation

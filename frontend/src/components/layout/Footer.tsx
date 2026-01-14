@@ -47,10 +47,8 @@ export function Footer() {
             <ul className="space-y-3">
               <FooterLink href="/chat">AI Chat Assistant</FooterLink>
               <FooterLink href="/dashboard">Security Dashboard</FooterLink>
-              <FooterLink href="https://hafiznaveedchuhan-ctrl.github.io/CYBERSECURITY-WORKER-AGENT/" external>
-                Documentation
-              </FooterLink>
-              <FooterLink href="/tools">Security Tools</FooterLink>
+              <FooterLink href="/docs">Documentation</FooterLink>
+              <FooterLink href="/docs">AI-SOC Textbook</FooterLink>
             </ul>
           </div>
 
@@ -61,15 +59,9 @@ export function Footer() {
               Learn
             </h4>
             <ul className="space-y-3">
-              <FooterLink href="https://hafiznaveedchuhan-ctrl.github.io/CYBERSECURITY-WORKER-AGENT/docs/module-1-soc-foundations" external>
-                SOC Foundations
-              </FooterLink>
-              <FooterLink href="https://hafiznaveedchuhan-ctrl.github.io/CYBERSECURITY-WORKER-AGENT/docs/module-2-agentic-ai" external>
-                AI Employs
-              </FooterLink>
-              <FooterLink href="https://hafiznaveedchuhan-ctrl.github.io/CYBERSECURITY-WORKER-AGENT/docs/module-3-ai-soc-workflows" external>
-                AI Workflows
-              </FooterLink>
+              <FooterLink href="/docs">SOC Foundations</FooterLink>
+              <FooterLink href="/docs">AI Employs</FooterLink>
+              <FooterLink href="/docs">AI Workflows</FooterLink>
               <FooterLink href="https://attack.mitre.org/" external>
                 MITRE ATT&CK
               </FooterLink>
