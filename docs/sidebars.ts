@@ -42,11 +42,11 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'Fundamentals',
+      label: 'Module 5: Core Security Concepts',
       items: [
-        'fundamentals/soc-overview',
-        'fundamentals/threat-landscape',
-        'fundamentals/security-frameworks',
+        'module-5-core-concepts/index',
+        'module-5-core-concepts/01-threat-landscape',
+        'module-5-core-concepts/02-security-frameworks',
       ],
     },
     {
