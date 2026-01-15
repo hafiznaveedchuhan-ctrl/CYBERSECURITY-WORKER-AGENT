@@ -108,6 +108,6 @@ Start with strong fundamentals before implementing advanced technologies. A well
 
 ## Next Steps
 
-- Learn about the [Threat Landscape](/fundamentals/threat-landscape)
-- Explore [Security Frameworks](/fundamentals/security-frameworks)
-- Understand [Detection Engineering](/detection/sigma-rules)
+- Learn about the [Threat Landscape](./threat-landscape)
+- Explore [Security Frameworks](./security-frameworks)
+- Understand [Detection Engineering](../detection/sigma-rules)

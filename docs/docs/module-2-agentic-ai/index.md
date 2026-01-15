@@ -18,11 +18,8 @@ By the end of this module, you will be able to:
 
 ## Module Contents
 
-- [Introduction to Agentic AI](./01-introduction.md)
-- [Agent Architecture](./02-architecture.md)
-- [Security Agent Use Cases](./03-use-cases.md)
-- [Agent Safety and Guardrails](./04-safety.md)
-- [Building SOC Agents](./05-building-agents.md)
+- [Introduction to Agentic AI](/docs/module-2-agentic-ai/introduction)
+- [Agent Architecture](/docs/module-2-agentic-ai/architecture)
 
 ## Prerequisites
 

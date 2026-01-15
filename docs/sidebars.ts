@@ -51,20 +51,6 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'Detection Engineering',
-      items: [
-        'detection/sigma-rules',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Incident Response',
-      items: [
-        'incident-response/ir-process',
-      ],
-    },
-    {
-      type: 'category',
       label: 'Module 6: Advanced Implementation',
       items: [
         'module-6-advanced-implementation/index',
@@ -84,6 +70,20 @@ const sidebars: SidebarsConfig = {
         'module-7-future-proofing/02-zero-day-detection',
         'module-7-future-proofing/03-threat-actor-evolution',
         'module-7-future-proofing/04-global-soc',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Detection Engineering',
+      items: [
+        'detection/sigma-rules',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Incident Response',
+      items: [
+        'incident-response/ir-process',
       ],
     },
   ],

@@ -15,10 +15,7 @@ This module covers security considerations when deploying AI agents in security 
 
 ## Module Contents
 
-- [AI Security Risks](./01-risks.md)
-- [Prompt Injection Defense](./02-prompt-injection.md)
-- [Secure Agent Design](./03-secure-design.md)
-- [Audit and Compliance](./04-audit.md)
+- [AI Security Risks](/docs/module-4-ai-security/risks)
 
 ## Prerequisites
 

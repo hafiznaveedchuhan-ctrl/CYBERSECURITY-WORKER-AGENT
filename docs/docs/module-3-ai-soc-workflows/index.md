@@ -15,10 +15,7 @@ This module covers practical AI-enhanced workflows for Security Operations Cente
 
 ## Module Contents
 
-- [AI-Assisted Triage](./01-ai-triage.md)
-- [Automated Enrichment](./02-enrichment.md)
-- [Incident Response Automation](./03-ir-automation.md)
-- [Report Generation](./04-reports.md)
+- [AI-Assisted Triage](/docs/module-3-ai-soc-workflows/ai-triage)
 
 ## Prerequisites
 

@@ -32,24 +32,44 @@ This textbook is designed for security professionals who want to:
 
 ### Module 1: SOC Foundations
 Learn the fundamentals of Security Operations Centers:
-- [SOC Introduction](/module-1-soc-foundations/01-introduction)
-- [Team Roles](/module-1-soc-foundations/02-team-roles)
-- [Alert Triage Process](/module-1-soc-foundations/03-alert-triage)
-- [SOC Tools](/module-1-soc-foundations/04-tools)
-- [Incident Response Basics](/module-1-soc-foundations/05-incident-response)
+- [SOC Introduction](./module-1-soc-foundations/introduction)
+- [Team Roles](./module-1-soc-foundations/team-roles)
+- [Alert Triage Process](./module-1-soc-foundations/alert-triage)
+- [SOC Tools](./module-1-soc-foundations/tools)
+- [Incident Response Basics](./module-1-soc-foundations/incident-response)
 
 ### Module 2: Agentic AI
 Understand AI agents and their applications in security:
-- [Introduction to Agentic AI](/module-2-agentic-ai/01-introduction)
-- [Agent Architecture](/module-2-agentic-ai/02-architecture)
+- [Introduction to Agentic AI](./module-2-agentic-ai/introduction)
+- [Agent Architecture](./module-2-agentic-ai/architecture)
 
 ### Module 3: AI-SOC Workflows
 Practical AI-enhanced security workflows:
-- [AI-Assisted Triage](/module-3-ai-soc-workflows/01-ai-triage)
+- [AI-Assisted Triage](./module-3-ai-soc-workflows/ai-triage)
 
 ### Module 4: AI Security
 Security considerations for AI systems:
-- [AI Security Risks](/module-4-ai-security/01-risks)
+- [AI Security Risks](./module-4-ai-security/risks)
+
+### Module 5: Core Security Concepts
+Master foundational security knowledge:
+- [Threat Landscape](./module-5-core-concepts/01-threat-landscape)
+- [Security Frameworks](./module-5-core-concepts/02-security-frameworks)
+
+### Module 6: Advanced Implementation
+Production-grade AI SOC systems:
+- [Ransomware Simulation](./module-6-advanced-implementation/01-ransomware-simulation)
+- [Accuracy Deep Dive](./module-6-advanced-implementation/02-accuracy-deep-dive)
+- [Detection Rules](./module-6-advanced-implementation/03-detection-rules)
+- [Compliance](./module-6-advanced-implementation/04-compliance)
+- [Reporting](./module-6-advanced-implementation/05-reporting)
+
+### Module 7: Future-Proofing
+Strategic guidance for evolving threats:
+- [Continuous Learning](./module-7-future-proofing/01-continuous-learning)
+- [Zero-Day Detection](./module-7-future-proofing/02-zero-day-detection)
+- [Threat Actor Evolution](./module-7-future-proofing/03-threat-actor-evolution)
+- [Global SOC](./module-7-future-proofing/04-global-soc)
 
 ## Platform Features
 
@@ -95,9 +115,12 @@ Highlight text you don't understand and click "Ask AI" for an instant explanatio
 - Module 2: 3-4 hours
 - Module 3: 3-4 hours
 - Module 4: 2-3 hours
+- Module 5: 3-4 hours
+- Module 6: 4-5 hours
+- Module 7: 3-4 hours
 
-**Total**: ~12-17 hours
+**Total**: ~22-30 hours
 
 ---
 
-Ready to begin? Start with [Module 1: SOC Foundations](/module-1-soc-foundations/).
+Ready to begin? Start with [Module 1: SOC Foundations](./module-1-soc-foundations/).
